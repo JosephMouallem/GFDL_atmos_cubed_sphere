@@ -395,8 +395,10 @@ contains
 
        sphum = get_tracer_index (MODEL_ATMOS, 'sphum')
        if (flagstruct%hydrostatic) then
-          call allocate_fv_nest_BC_type(pe_eul_BC,is,ie,js,je,isd,ied,jsd,jed,npx,npy,npz+1,ng,0,0,0,.false.)
-          call compute_peBC(neststruct%delp_BC, pe_eul_bc, npx, npy, npz, parent_grid%ptop, bd) !assume nest's ptop equals its parent
+          if (.not. neststruct%do_remap_BC(flagstruct%grid_number)) then
+            call allocate_fv_nest_BC_type(pe_eul_BC,is,ie,js,je,isd,ied,jsd,jed,npx,npy,npz+1,ng,0,0,0,.false.)
+            call compute_peBC(neststruct%delp_BC, pe_eul_bc, npx, npy, npz, parent_grid%ptop, bd) !assume nest's ptop equals its parent
+          endif
           call setup_pt_BC(neststruct%pt_BC, pe_eul_BC, neststruct%q_BC(sphum), npx, npy, npz, zvir, bd)
        else
           if (neststruct%do_remap_BC(flagstruct%grid_number)) then
