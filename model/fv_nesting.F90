@@ -814,26 +814,19 @@ contains
 
    integer :: i,j,k
 
-   character(len=120) :: errstring
-
-!$OMP parallel do default(none) shared(istart,iend,jstart,jend,peBC,ptop_src)
-   do j=jstart,jend
-   do i=istart,iend
-      peBC(i,j,1) = ptop_src
-   enddo
-   enddo
-
-!$OMP parallel do default(none) shared(istart,iend,jstart,jend,npz,delp) private(peBC)
-   do k=2,npz+1
-   do j=jstart,jend
-   do i=istart,iend
-      peBC(i,j,k) = peBC (i,j,k-1) +delp(i,j,k-1)
-   enddo
-   enddo
-   enddo
+!$OMP parallel do default(none) shared(istart,iend,jstart,jend,peBC,ptop_src,delp,npz)
+             do j=jstart,jend
+             do i=istart,iend
+                peBC(i,j,1) = ptop_src
+             enddo
+             do k=1,npz
+             do i=istart,iend
+                peBC(i,j,k+1) = peBC(i,j,k) + delp(i,j,k)
+             enddo
+             enddo
+             enddo
 
  end subroutine compute_peBC_k
-
 
  subroutine setup_pt_BC_k(ptBC, sphumBC, peBC, zvir, isd_BC, ied_BC, istart, iend, jstart, jend, npz)
 
