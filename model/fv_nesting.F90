@@ -518,7 +518,7 @@ contains
 
        endif
 
-       if (flagstruct%hydrostatic) then
+       if (flagstruct%hydrostatic .and. (.not. neststruct%do_remap_BC(flagstruct%grid_number))) then
           call deallocate_fv_nest_BC_type(pe_eul_BC)
        endif
 
