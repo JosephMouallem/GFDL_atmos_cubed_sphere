@@ -773,10 +773,11 @@ contains
       endif
       call fv_sg_AM5(isd, ied, jsd, jed, isc, iec, jsc, jec, Atm(n)%npz, &
                         nt_dyn, dt_atmos, Atm(n)%flagstruct%fv_sg_adj,      &
+                        Atm(n)%flagstruct%fv_sg_adj_weak,                   &
                         Atm(n)%flagstruct%nwat, Atm(n)%delp, Atm(n)%pe,     &
                         Atm(n)%peln, Atm(n)%pkz, Atm(n)%pt, Atm(n)%q,       &
                         Atm(n)%ua, Atm(n)%va, Atm(n)%flagstruct%hydrostatic,&
-                        Atm(n)%w, Atm(n)%delz, u_dt, v_dt, t_dt, q_dt,      &
+                        Atm(n)%w, Atm(n)%delz, u_dt, v_dt,                  &
                         Atm(n)%flagstruct%n_sponge)
    endif
 

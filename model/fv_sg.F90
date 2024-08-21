@@ -501,13 +501,14 @@ enddo
  end subroutine fv_sg_SHiELD
 
  subroutine fv_sg_AM5( isd, ied, jsd, jed, is, ie, js, je, km, nq, dt,    &
-                         tau, nwat, delp, pe, peln, pkz, ta, qa, ua, va,  &
-                         hydrostatic, w, delz, u_dt, v_dt, t_dt, q_dt, k_bot )
+                         fv_sg_adj, fv_sg_adj_weak, nwat, delp, pe, peln, pkz, ta, qa, ua, va,  &
+                         hydrostatic, w, delz, u_dt, v_dt, k_bot_full )
 ! Dry convective adjustment-mixing
 !-------------------------------------------
       integer, intent(in):: is, ie, js, je, km, nq, nwat
       integer, intent(in):: isd, ied, jsd, jed
-      integer, intent(in):: tau         ! Relaxation time scale
+      integer, intent(in):: fv_sg_adj         ! Relaxation time scale
+      integer, intent(in):: fv_sg_adj_weak    ! Relaxation time scale
       real, intent(in):: dt             ! model time step
       real, intent(in)::   pe(is-1:ie+1,km+1,js-1:je+1)
       real, intent(in):: peln(is  :ie,  km+1,js  :je)
@@ -515,7 +516,7 @@ enddo
       real, intent(in):: delz(is:,js:,1:)      ! Delta z at each model level
       real, intent(in)::  pkz(is:ie,js:je,km)
       logical, intent(in)::  hydrostatic
-   integer, intent(in), optional:: k_bot
+   integer, intent(in), optional:: k_bot_full
 !
       real, intent(inout):: ua(isd:ied,jsd:jed,km)
       real, intent(inout):: va(isd:ied,jsd:jed,km)
@@ -524,14 +525,13 @@ enddo
       real, intent(inout):: qa(isd:ied,jsd:jed,km,nq)   ! Specific humidity & tracers
       real, intent(inout):: u_dt(isd:ied,jsd:jed,km)
       real, intent(inout):: v_dt(isd:ied,jsd:jed,km)
-      real, intent(inout):: t_dt(is:ie,js:je,km)
-      real, intent(inout):: q_dt(is:ie,js:je,km,nq)
 !---------------------------Local variables-----------------------------
       real, dimension(is:ie,km):: u0, v0, w0, t0, hd, te, gz, tvm, pm, den
       real q0(is:ie,km,nq), qcon(is:ie,km)
+      real fra(k)
       real, dimension(is:ie):: gzh, lcp2, icp2, cvm, cpm, qs
       real ri_ref, ri, pt1, pt2, ratio, tv, cv, tmp, q_liq, q_sol
-      real tv1, tv2, g2, h0, mc, fra, rk, rz, rdt, tvd, tv_surf
+      real tv1, tv2, g2, h0, mc, rk, rz, rdt, tvd, tv_surf
       real dh, dq, qsw, dqsdt, tcp3
       integer i, j, k, kk, n, m, iq, km1, im, kbot
       real, parameter:: ustar2 = 1.E-4
@@ -548,9 +548,9 @@ enddo
       rdt = 1./ dt
       im = ie-is+1
 
-      if ( present(k_bot) ) then
-           if ( k_bot < 3 ) return
-           kbot = k_bot
+      if ( present(k_bot_full) .and. fv_sg_adj_weak <=0.) then
+           !if ( k_bot < 3 ) return
+           kbot = k_bot_full
       else
            kbot = km
       endif
@@ -575,7 +575,15 @@ enddo
 ! volume and mass is locally conserved).
 !------------------------------------------------------------------------
    m = 3
-   fra = dt/real(tau)
+   do k=1,km
+      if ( k <= k_bot_full) then
+         fra(k) = dt/real(fv_sg_adj)
+      else if (fv_sg_adj_weak > 0.) then
+         fra(k) = dt/real(fv_sg_adj_weak)
+      else
+         fra(k) = 0.
+      endif
+   enddo
 
 !$OMP parallel do default(none) shared(im,is,ie,js,je,nq,kbot,qa,ta,sphum,ua,va,delp,peln,     &
 !$OMP                                  hydrostatic,pe,delz,g2,w,liq_wat,rainwat,ice_wat,  &
@@ -857,19 +865,18 @@ enddo
    enddo       ! n-loop
 
 !--------------------
-   if ( fra < 1. ) then
       do k=1, kbot
          do i=is,ie
-            t0(i,k) = ta(i,j,k) + (t0(i,k) - ta(i,j,k))*fra
-            u0(i,k) = ua(i,j,k) + (u0(i,k) - ua(i,j,k))*fra
-            v0(i,k) = va(i,j,k) + (v0(i,k) - va(i,j,k))*fra
+            t0(i,k) = ta(i,j,k) + (t0(i,k) - ta(i,j,k))*fra(k)
+            u0(i,k) = ua(i,j,k) + (u0(i,k) - ua(i,j,k))*fra(k)
+            v0(i,k) = va(i,j,k) + (v0(i,k) - va(i,j,k))*fra(k)
          enddo
       enddo
 
       if ( .not. hydrostatic ) then
          do k=1,kbot
             do i=is,ie
-               w0(i,k) = w(i,j,k) + (w0(i,k) - w(i,j,k))*fra
+               w0(i,k) = w(i,j,k) + (w0(i,k) - w(i,j,k))*fra(k)
             enddo
          enddo
       endif
@@ -877,11 +884,10 @@ enddo
       do iq=1,nq
          do k=1,kbot
             do i=is,ie
-               q0(i,k,iq) = qa(i,j,k,iq) + (q0(i,k,iq) - qa(i,j,k,iq))*fra
+               q0(i,k,iq) = qa(i,j,k,iq) + (q0(i,k,iq) - qa(i,j,k,iq))*fra(k)
             enddo
          enddo
       enddo
-   endif
 
 !----------------------
 ! Saturation adjustment
