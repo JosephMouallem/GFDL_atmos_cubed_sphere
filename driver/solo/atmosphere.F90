@@ -458,7 +458,7 @@ contains
             Atm(n)%u_srf, Atm(n)%v_srf,  Atm(n)%ts, Atm(n)%delz,            &
             Atm(n)%flagstruct%hydrostatic, Atm(n)%oro, .false.,             &
             Atm(n)%flagstruct%p_ref,                                        &
-            Atm(n)%flagstruct%fv_sg_adj, Atm(n)%flagstruct%do_Held_Suarez,  &
+            Atm(n)%flagstruct%do_Held_Suarez,  &
             Atm(n)%gridstruct, Atm(n)%flagstruct, Atm(n)%neststruct,        &
             Atm(n)%flagstruct%nwat, Atm(n)%bd,                              &
             Atm(n)%domain, fv_time, Atm(n)%phys_diag, Atm(n)%nudge_diag, time_total)
