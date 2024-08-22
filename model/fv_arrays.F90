@@ -170,6 +170,10 @@ module fv_arrays_mod
      logical:: se_corner = .false.
      logical:: ne_corner = .false.
      logical:: nw_corner = .false.
+     logical:: west = .false.
+     logical:: east = .false.
+     logical:: north = .false.
+     logical:: south = .false.
 
      real(kind=R_GRID) :: da_min, da_max, da_min_c, da_max_c
 
@@ -398,6 +402,7 @@ module fv_arrays_mod
                                      !< enabling this damping when the linear or non-monotonic
                                      !< horizontal advection schemes are enabled, but is unnecessary and
                                      !< not recommended when using monotonic advection. The default is .false.
+   logical :: do_lateral_damp = .false.
    logical :: use_old_omega = .true.
    logical :: remap_te = .false.  !< A developmental option, remap total energy based on abs(kord_tm)
                                   !< if kord_tm=0 use GMAO Cubic, otherwise as

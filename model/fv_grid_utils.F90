@@ -117,6 +117,7 @@
       real(kind=R_GRID), pointer, dimension(:,:,:) :: en1, en2
 !     real(kind=R_GRID), pointer, dimension(:,:) :: eww, ess
       logical, pointer :: sw_corner, se_corner, ne_corner, nw_corner
+      logical, pointer :: south, north, east , west 
 
       is  = Atm%bd%is
       ie  = Atm%bd%ie
@@ -173,6 +174,10 @@
       se_corner                     => Atm%gridstruct%se_corner
       ne_corner                     => Atm%gridstruct%ne_corner
       nw_corner                     => Atm%gridstruct%nw_corner
+      north                     => Atm%gridstruct%north
+      south                     => Atm%gridstruct%south
+      east                     => Atm%gridstruct%east
+      west                     => Atm%gridstruct%west
 
       if ( (Atm%flagstruct%do_schmidt .or. Atm%flagstruct%do_cube_transform) .and. abs(Atm%flagstruct%stretch_fac-1.) > 1.E-5 ) then
            Atm%gridstruct%stretched_grid = .true.
@@ -226,6 +231,14 @@
          if ( (ie+1)==npx .and. (je+1)==npy ) ne_corner = .true.
          if (       is==1 .and. (je+1)==npy ) nw_corner = .true.
       endif
+
+      if (grid_type ==4) then
+         if (       is==1 )      west = .true.
+         if ( (ie+1)==npx )      east = .true.
+         if ( (je+1)==npy ) north = .true.
+         if (       js==1 ) south = .true.
+      endif
+
 
   if ( sw_corner ) then
        tmp1 = great_circle_dist(grid(1,1,1:2), agrid(1,1,1:2))

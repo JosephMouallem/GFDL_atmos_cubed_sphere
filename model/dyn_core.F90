@@ -702,7 +702,8 @@ contains
        else
 ! Sponge layers with del-2 damping on divergence, vorticity, w, z, and air mass (delp).
 ! no special damping of potential temperature in sponge layers
-              if ( k==1 ) then
+              if ( k==1 .or. flagstruct%do_lateral_damp ) then 
+                if ( gridstruct%west .or. gridstruct%east .or. gridstruct%west .or. gridstruct%north ) then
 ! Divergence damping:
                  nord_k=0;
                  if (flagstruct%is_ideal_case) then
@@ -720,6 +721,7 @@ contains
 #endif
                    endif
                    d_con_k = 0.
+                endif
               elseif ( k==2 .and. flagstruct%d2_bg_k2>0.01 ) then
                    nord_k=0; d2_divg = max(flagstruct%d2_bg, flagstruct%d2_bg_k2)
                    nord_w=0; damp_w = d2_divg

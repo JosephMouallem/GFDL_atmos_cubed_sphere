@@ -176,6 +176,7 @@ module fv_control_mod
      logical , pointer :: no_dycore
      logical , pointer :: convert_ke
      logical , pointer :: do_vort_damp
+     logical , pointer :: do_lateral_damp
      logical , pointer :: use_old_omega
      logical , pointer :: remap_te
      ! PG off centering:
@@ -715,6 +716,7 @@ module fv_control_mod
        no_dycore                     => Atm%flagstruct%no_dycore
        convert_ke                    => Atm%flagstruct%convert_ke
        do_vort_damp                  => Atm%flagstruct%do_vort_damp
+       do_lateral_damp               => Atm%flagstruct%do_lateral_damp
        use_old_omega                 => Atm%flagstruct%use_old_omega
        beta                          => Atm%flagstruct%beta
        n_sponge                      => Atm%flagstruct%n_sponge
@@ -943,7 +945,7 @@ module fv_control_mod
             warm_start, adjust_dry_mass, mountain, d_con, ke_bg, nord, nord_tr, convert_ke, use_old_omega, &
             dry_mass, grid_type, do_Held_Suarez, &
             consv_te, fill, filter_phys, fill_dp, fill_wz, fill_gfs, consv_am, RF_fast, &
-            range_warn, dwind_2d, inline_q, z_tracer, reproduce_sum, adiabatic, do_vort_damp, no_dycore,   &
+            range_warn, dwind_2d, inline_q, z_tracer, reproduce_sum, adiabatic, do_vort_damp, do_lateral_damp, no_dycore,   &
             tau, fast_tau_w_sec, tau_h2o, rf_cutoff, nf_omega, hydrostatic, fv_sg_adj, sg_cutoff, breed_vortex_inline,  &
             na_init, nudge_dz, hybrid_z, Make_NH, n_zs_filter, nord_zs_filter, full_zs_filter, reset_eta,         &
             pnats, dnats, dnrts, a2b_ord, remap_t, p_ref, d2_bg_k1, d2_bg_k2,  &
