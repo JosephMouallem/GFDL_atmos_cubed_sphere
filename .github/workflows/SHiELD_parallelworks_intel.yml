@@ -34,7 +34,6 @@ jobs:
     # so this salloc will prompt 46 nodes to startup and stay active for 20 min
     # this is enough nodes for the first 17 tests to run in parallel, and we
     # have 17 runners configured.
-    - run: salloc --partition=compute -N 46 -J $GITHUB_SHA sleep 20m &
     - run: /contrib/fv3/GFDL_atmos_cubed_sphere_CI/checkout.sh -b $GITHUB_REF -h $GITHUB_SHA
     - run: |
         cd /contrib/fv3/2023.2.0/GFDL_atmos_cubed_sphere/$GITHUB_REF/$GITHUB_SHA/SHiELD_SRC/atmos_drivers
@@ -120,7 +119,6 @@ jobs:
           - d96_500m.solo.mtn_schar
     steps:
       # This will end the slurm job started in the checkout job
-      - run: scancel -n $GITHUB_SHA
       - env:
           RUNSCRIPT: ${{ matrix.runscript }}
           ARG1: ${{ matrix.argument }}
