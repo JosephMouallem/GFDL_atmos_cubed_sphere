@@ -64,7 +64,7 @@ jobs:
           HYDRO: ${{ matrix.hydro }}
           BIT: ${{ matrix.bit }}
           MODE: ${{ matrix.mode }}
-        run: $RUNSCRIPT -b $GITHUB_REF -h $GITHUB_SHA -c $CONFIG --hydro $HYDRO --bit $BIT -m $MODE
+        run: bash -c "$RUNSCRIPT -b $GITHUB_REF -h $GITHUB_SHA -c $CONFIG --hydro $HYDRO --bit $BIT -m $MODE"
         
   test:
     if: github.repository == 'NOAA-GFDL/GFDL_atmos_cubed_sphere'
@@ -122,7 +122,8 @@ jobs:
       - env:
           RUNSCRIPT: ${{ matrix.runscript }}
           ARG1: ${{ matrix.argument }}
-        run: $RUNSCRIPT -t $ARG1 -b $GITHUB_REF -h $GITHUB_SHA
+        run: bash -c "$RUNSCRIPT -t $ARG1 -b $GITHUB_REF -h $GITHUB_SHA"
+     
   shutdown:
     if: always() && github.repository == 'NOAA-GFDL/GFDL_atmos_cubed_sphere'
     runs-on: [gfdlacsciintel]
