@@ -64,7 +64,9 @@ jobs:
           HYDRO: ${{ matrix.hydro }}
           BIT: ${{ matrix.bit }}
           MODE: ${{ matrix.mode }}
-        run: bash -c "$RUNSCRIPT -b $GITHUB_REF -h $GITHUB_SHA -c $CONFIG --hydro $HYDRO --bit $BIT -m $MODE"
+        run: |
+           chmod +x /contrib/containers/load_spack_noaa-intel.sh
+           $RUNSCRIPT -b $GITHUB_REF -h $GITHUB_SHA -c $CONFIG --hydro $HYDRO --bit $BIT -m $MODE
         
   test:
     if: github.repository == 'NOAA-GFDL/GFDL_atmos_cubed_sphere'
@@ -118,7 +120,6 @@ jobs:
           - d96_2k.solo.bubble
           - d96_500m.solo.mtn_schar
     steps:
-      # This will end the slurm job started in the checkout job
       - env:
           RUNSCRIPT: ${{ matrix.runscript }}
           ARG1: ${{ matrix.argument }}
@@ -170,7 +171,6 @@ jobs:
           - d96_2k.solo.bubble
           - d96_500m.solo.mtn_schar
     steps:
-      - run: scancel -n $GITHUB_SHA
       - env:
           JOB: ${{ github.sha }}_${{ matrix.test }}
         run: scancel -n $JOB
