@@ -30,18 +30,7 @@ jobs:
     runs-on: [gfdlacsciintel]
     name: Checkout Code
     steps:
-    # It can take a long time (5-15 minutes) to spinup nodes
-    # so this salloc will prompt 46 nodes to startup and stay active for 20 min
-    # this is enough nodes for the first 17 tests to run in parallel, and we
-    # have 17 runners configured.
     - run: /contrib/fv3/GFDL_atmos_cubed_sphere_CI/checkout.sh -b $GITHUB_REF -h $GITHUB_SHA
-    - run: |
-        cd /contrib/fv3/2023.2.0/GFDL_atmos_cubed_sphere/$GITHUB_REF/$GITHUB_SHA/SHiELD_SRC/atmos_drivers
-        git fetch origin pull/72/head:pr-72
-        git checkout pr-72
-        cd /contrib/fv3/2023.2.0/GFDL_atmos_cubed_sphere/$GITHUB_REF/$GITHUB_SHA/SHiELD_SRC/SHiELD_physics
-        git fetch origin pull/84/head:pr-84
-        git checkout pr-84
     
   build:
     if: github.repository == 'NOAA-GFDL/GFDL_atmos_cubed_sphere'
